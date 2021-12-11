@@ -1,0 +1,46 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/forms.css">
+<link rel="stylesheet" href="/css/product.css">
+<link rel="stylesheet" href="/css/cart.css">
+<link rel="stylesheet" href="/css/auth.css" />
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <main>
+        <div class="login-form">
+            <div class="form-control">
+                <!-- Elements will create input elements here -->
+                <label for="name">Full Name:</label>
+                <input type="text" name="name" id="name">
+            </div>
+            <div class="form-control">
+                <!-- Elements will create input elements here -->
+                <label for="email">Email:</label>
+                <input type="email" name="email" id="email" value="<%= email %>" disabled>
+            </div>
+            <div class="form-control">
+                <label for="title">Amount:</label>
+                <input type="tel" name="amount" id="amount" disabled value=<%= amount  %>>
+            </div>
+            <input type="hidden" value="<%= csrfToken %>" name="_csrf" />
+            <button class="btn" onclick="pay(this)">Pay</button>
+        </div>
+        <div style="margin-top: 30px;">
+            <h3 class="centered">Cart Items</h3>
+            <% if (cartProducts.length > 0) { %>
+            <ul class="cart__item-list">
+                <% cartProducts.forEach(p => { %>
+                <li class="cart__item">
+                    <h1><%= p.productId.title %></h1>
+                    <h2>Quantity: <%= p.quantity %></h2>
+                </li>
+                <% }) %>
+            </ul>
+            <% }  %>
+        </div>
+        </div>
+    </main>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="/js/pay.js"></script>
+    <%- include('../includes/end.ejs') %>
