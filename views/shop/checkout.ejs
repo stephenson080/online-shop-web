@@ -24,7 +24,10 @@
                 <input type="tel" name="amount" id="amount" disabled value=<%= amount  %>>
             </div>
             <input type="hidden" value="<%= csrfToken %>" name="_csrf" />
-            <button class="btn" onclick="pay(this)">Pay</button>
+            <button disabled class="btn" onclick="pay(this)">Pay</button>
+            <form>
+                <button disabled class="btn">Verify</button>
+            </form>
         </div>
         <div style="margin-top: 30px;">
             <h3 class="centered">Cart Items</h3>

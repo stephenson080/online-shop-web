@@ -1,9 +1,9 @@
-
+let csrfToken;
 const pay = (btn) => {
-    const csrfToken = btn.parentNode.querySelector('[name=_csrf]').value
-    const email = document.getElementById('email').value
-    const amount = Math.floor(document.getElementById('amount').value)
-    console.log(csrfToken, amount, email)
+    csrfToken = btn.parentNode.querySelector('[name=_csrf]').value
+    const email = document.getElementById("email").value
+    const amount = document.getElementById("amount").value
+    console.log(amount, email, csrfToken)
     let handler = PaystackPop.setup({
         key: 'pk_test_fcf99343fc472d939ef5bbe6ddca897535f30027', // Replace with your public key
         email: email,
@@ -13,26 +13,18 @@ const pay = (btn) => {
         onClose: function () {
             alert('Window closed.');
         },
-        callback: function (response) {
-            let message = 'Payment complete! Reference: ' + response.reference;
-            alert(message);
-            console.log(response.reference)
-            const ref = {
-                reference: response.reference
-            }
-            fetch('http://localhost:3000/verify-payment', {
-                method: 'POST',
-                body: JSON.stringify(ref),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => {
-                    return res.json()
-            })
-            .then(resData => console.log(resData))
-            .catch(err => console.log(err))
-        }
-    })
+        callback: verify
+    });
     handler.openIframe();
-} 
+}
+
+function verify(response) {
+    let message = 'Payment complete! Reference: ' + response.reference;
+
+    alert(message);
+    console.log(response.reference)
+    const ref = {
+        reference: response.reference
+    }
+    console.log(response.reference, 's')
+}

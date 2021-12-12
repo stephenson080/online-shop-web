@@ -1,8 +1,7 @@
 const path = require("path")
 const fs = require("fs")
 const PDFDocument = require("pdfkit")
-const { verifyPayment } = require('../util/paystack/verifyPayment')
-const axios = require('axios')
+const axios = require('axios').default
 
 const Product = require("../models/product")
 const Order = require("../models/order")
@@ -236,18 +235,14 @@ exports.checkout = async (req, res, next) => {
         products.forEach(prod => {
             amount += prod.quantity * prod.productId.price
         })
-
-        axios.default.post('https://onlinepay.herokuapp.com/', {amount: amount}).then(res => {
-            console.log(res.data)
-            return res.render("shop/checkout", {
-                path: '/checkout',
-                docTitle: 'checkout',
-                amount: amount / 100,
-                email: user.email,
-                cartProducts: products
-            })
+        return res.render("shop/checkout", {
+            path: '/checkout',
+            docTitle: 'checkout',
+            amount: amount / 100,
+            email: user.email,
+            cartProducts: products
         })
-       
+
     } catch (err) {
         res.redirect("/500")
         const error = new Error(err)
@@ -257,16 +252,23 @@ exports.checkout = async (req, res, next) => {
 
 }
 exports.verifyPayment = async (req, res, next) => {
-    try {
-        const data = verifyPayment(req.body.reference)
-        console.log(data)
-        return res.json({data})
-    } catch (err) {
-        console.log(err)
-        res.redirect("/500")
-        const error = new Error(err)
-        error.statusCode = 500
-        return next(error)
+    const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY
+    exports.verifyPayment = async (req, res) => {
+        try {
+            const reference = req.params.ref
+            console.log(reference)
+            const resData = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
+                headers: {
+                    'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`
+                }
+            })
+            res.json({
+                data: resData.data
+            })
+        } catch (error) {
+            console.log(err)
+        }
+
     }
 }
 exports.AddToOrders = (req, res) => {
