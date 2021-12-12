@@ -19,7 +19,7 @@ const authRoutes = require("./routes/auth")
 const {get404Page,get500Page} = require("./controllers/errors")
 
 const store = new MongoDbStore({
-    uri: "mongodb+srv://stephen:pathagoras1555@cluster0.xrlnc.mongodb.net/online-shop?retryWrites=true&w=majority",
+    uri: process.env.DATABASE_URL,
     collection: "session"
 })
 const csrfProtection = csrf()
@@ -105,7 +105,7 @@ app.use((err,req,res,next)=>{
 
 const PORT = process.env.PORT || 3000
 
-moongoose.connect("mongodb+srv://stephen:pathagoras1555@cluster0.xrlnc.mongodb.net/online-shop?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true})
+moongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTopology: true})
 .then(result=>{
     app.listen(PORT,()=>{
         console.log("app is running")
