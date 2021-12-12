@@ -237,7 +237,7 @@ exports.checkout = async (req, res, next) => {
             amount += prod.quantity * prod.productId.price
         })
 
-        axios.default.post('http://localhost:3000/', {amount: amount}).then(res => {
+        axios.default.post('https://onlinepay.herokuapp.com/', {amount: amount}).then(res => {
             console.log(res.data)
             return res.render("shop/checkout", {
                 path: '/checkout',
