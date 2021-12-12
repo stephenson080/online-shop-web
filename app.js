@@ -11,7 +11,6 @@ const multer = require("multer")
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 }
-// const {mongoConnection} = require("./util/database")
 
 const shopRoutes = require("./routes/shop")
 const adminRoutes = require("./routes/admin")
@@ -23,12 +22,7 @@ const store = new MongoDbStore({
     collection: "session"
 })
 const csrfProtection = csrf()
-// const Product = require("./models/product")
 const User = require("./models/user")
-// const Cart = require("./models/cart")
-// const CartItem = require("./models/cart-item")
-// const Order = require("./models/order")
-// const OrderItem = require("./models/order-item")
 
 const app = express();
 
@@ -40,13 +34,7 @@ const fileStorage = multer.diskStorage({
         cb(null, Date.now().toString() + "_" + file.originalname)
     }
 })
-// const fileFilter = (req, file,cb)=>{
-//     if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg", file.mimetype === "image/png"){
-//         cb(null, true)
-//     }else{
-//         cb(null, false)
-//     }
-// }
+
 
 app.set("view engine", "ejs")
 app.set("views", "views")
@@ -74,16 +62,7 @@ app.use((req,res, next)=>{
     }).catch(err=> {
         throw new Error(err)
     })
-    
-    // User.findAll({
-    //     where: {
-    //         id: 1
-    //     }
-    // }).then(user=>{
-    //     req.user = user[0]
-    //     next()
-    // }).catch(err=> console.log(err))
-})
+    })
 
 app.use((req,res,next)=>{
     res.locals.isLoggedIn = req.session.isLoggedIn
@@ -111,64 +90,3 @@ moongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTo
         console.log("app is running")
     })
 })
-// mongoConnection(()=>{
-//     app.listen(3000,()=>{
-//         console.log("app is running")
-//     })
-// })
-
-// app.use((req,res, next)=>{
-//     User.findAll({
-//         where: {
-//             id: 1
-//         }
-//     }).then(user=>{
-//         req.user = user[0]
-//         next()
-//     }).catch(err=> console.log(err))
-// })
-
-
-
-
-
-
-
-// Product.belongsTo(User)
-// User.hasMany(Product)
-// User.hasOne(Cart)
-// Cart.belongsTo(User)
-// Cart.belongsToMany(Product, {through: CartItem})
-// Product.belongsToMany(Cart, {through: CartItem})
-// User.hasMany(Order)
-// Order.belongsTo(User)
-// Product.belongsToMany(Order, {through: OrderItem})
-// Order.belongsToMany(Product, {through: OrderItem})
-// sequelize
-//     // .sync({force: true})
-//     .sync()
-//     .then(result=>{
-//         // console.log(result)
-//         return User.findAll({where: {
-//             id: 1
-//         }})
-//     })
-//     .then(user=>{
-//         if(!user[0]){
-//             return User.create({
-//                 name: "Stephen",
-//                 email: "test@test.com"
-//             })
-//         }
-//         return user[0]
-//     })
-//     .then(user=>{
-//         return user.createCart()
-//     })
-//     .then(cart =>{
-//         console.log(cart)
-//         app.listen(3000, ()=>{
-//             "app is running"
-//         })
-//     })
-//     .catch(err => console.log(err))

@@ -35,8 +35,6 @@ exports.getProducts = (req, res, next) => {
                 })
         })
         .catch(err => {
-            console.log(err)
-            res.redirect("/500")
             const error = new Error(err)
             error.statusCode = 500
             return next(error)
@@ -51,20 +49,10 @@ exports.getProductDetails = (req, res) => {
             res.render("shop/product-detail", { product: product, path: "/products", docTitle: product.title })
         })
         .catch(err => {
-            console.log(err)
-            res.redirect("/500")
             const error = new Error(err)
             error.statusCode = 500
             return next(error)
         })
-    // Product.findAll({where: {
-    //     id: productId
-    // }})
-    // .then(product=>{
-    //     res.render("shop/product-detail", {product: product[0], path: "/products", docTitle: product[0].title})
-    // }).catch(err => console.log(err))
-
-
 }
 exports.getIndex = (req, res) => {
     const page = +req.query.page || 1
@@ -91,10 +79,9 @@ exports.getIndex = (req, res) => {
                 })
         })
         .catch(err => {
-            console.log(err)
-            // const error = new Error(err)
-            // error.statusCode = 500
-            // return next(error)
+            const error = new Error(err)
+            error.statusCode = 500
+            return next(error)
         })
 
 }
@@ -106,23 +93,10 @@ exports.getCart = (req, res) => {
             res.render("shop/cart", { docTitle: "Your Cart", path: "/cart", cartProducts: cartProducts })
         })
         .catch(err => {
-            console.log(err)
             const error = new Error(err)
             error.statusCode = 500
             return next(error)
         })
-    // Cart.getCartProducts(cart =>{
-    //     Product.getAllProducts(products=>{
-    //         const cartProducts = []
-    //         for(let product of products){
-    //             const cartProductsData = cart.products.find(prod=> prod.id === product.id)
-    //             if(cartProductsData){
-    //                 cartProducts.push({productData: product, qty: cartProductsData.qty})
-    //             }
-    //         }
-    //         res.render("shop/cart", {docTitle: "Your Cart", path: "/cart", cartProducts: cartProducts})
-    //     })
-    // })
 
 }
 
@@ -133,54 +107,13 @@ exports.addToCart = (req, res) => {
             return req.user.addToCart(product)
         })
         .then(result => {
-            console.log(result)
             res.redirect("/cart")
         })
         .catch(err => {
-            console.log(err)
-            res.redirect("/500")
             const error = new Error(err)
             error.statusCode = 500
             return next(error)
         })
-    // let fetchedCart
-    // let newQuantity = 1 
-    // req.user
-    // .getCart()
-    // .then(cart =>{
-    //     fetchedCart= cart
-    //     return cart.getProducts({where: {id: productId}})
-    // })
-    // .then(products=>{
-    //     let product
-    //     if (products.length > 0){
-    //         product = products[0]
-    //     }
-    //     if(product){
-    //         const oldQuantity = product.cartItem.quantity
-    //         newQuantity = oldQuantity + 1
-    //         return product
-    //     }
-    //     return Product.findAll({
-    //         where: {
-    //             id: productId
-    //         }
-    //     })
-
-    // })
-    // .then(fetchedProduct=>{
-    //     return fetchedCart.addProduct(fetchedProduct, {through: {quantity: newQuantity}})
-    // })
-    // .then(result=>{
-    //     res.redirect("/cart")
-    // })
-    // .catch(err=>{
-    //     console.log(err)
-    // })
-    // Product.findProductById(productId, product=>{
-    //     Cart.addProduct(productId, product.price)
-    // })
-
 }
 
 exports.deleteProductFromCart = (req, res) => {
@@ -190,24 +123,10 @@ exports.deleteProductFromCart = (req, res) => {
             res.redirect("/cart")
         })
         .catch(err => {
-            console.log(err)
-            res.redirect("/500")
             const error = new Error(err)
             error.statusCode = 500
             return next(error)
         })
-    // req.user
-    // .getCart()
-    // .then(cart=>{
-    //     return cart.getProducts({where: {id: productId}})
-    // })
-    // .then(products=>{
-    //     const product = products[0]
-    //     return product.cartItem.destroy()
-    // })
-    // .then(result=>{
-    //     res.redirect("/cart")
-    // })
 }
 exports.fetchOrders = (req, res, next) => {
     Order.find({ "user.userId": req.user._id })
@@ -215,17 +134,10 @@ exports.fetchOrders = (req, res, next) => {
             res.render("shop/orders", { docTitle: "Your Orders", path: "/orders", orders: orders })
         })
         .catch(err => {
-            console.log(err)
-            res.redirect("/500")
             const error = new Error(err)
             error.statusCode = 500
             return next(error)
         })
-    // req.user
-    // .getOrders({include: ['products']})
-    // .then(orders=>{
-    //     res.render("shop/orders", {docTitle: "Your Orders", path: "/orders", orders: orders})
-    // })
 }
 exports.checkout = async (req, res, next) => {
     try {
@@ -233,18 +145,18 @@ exports.checkout = async (req, res, next) => {
         const user = await req.user.populate("cart.items.productId").execPopulate()
         const products = user.cart.items
         products.forEach(prod => {
-            amount += prod.quantity * prod.productId.price
+            amount += prod.quantity * prod.productId.price * 489
         })
         return res.render("shop/checkout", {
             path: '/checkout',
-            docTitle: 'checkout',
+            docTitle: 'Checkout',
             amount: amount / 100,
             email: user.email,
+            paystackPK: process.env.PAYSTACK_PUBLIC_KEY,
             cartProducts: products
         })
 
     } catch (err) {
-        res.redirect("/500")
         const error = new Error(err)
         error.statusCode = 500
         return next(error)
@@ -253,22 +165,23 @@ exports.checkout = async (req, res, next) => {
 }
 exports.verifyPayment = async (req, res, next) => {
     const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY
-    exports.verifyPayment = async (req, res) => {
-        try {
-            const reference = req.params.ref
-            console.log(reference)
-            const resData = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
-                headers: {
-                    'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`
-                }
-            })
-            res.json({
-                data: resData.data
-            })
-        } catch (error) {
-            console.log(err)
-        }
-
+    try {
+        const reference = req.params.ref
+        const resData = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
+            headers: {
+                'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`
+            }
+        })
+        req.user.clearCart()
+        res.render('shop/success', {
+            docTitle: 'Payment Status',
+            path: '/status',
+            message: `Payment ${resData.data.data.gateway_response}`
+        })
+    } catch (err) {
+        const error = new Error(err.message)
+        error.statusCode = 500
+        return next(error)
     }
 }
 exports.AddToOrders = (req, res) => {
@@ -294,46 +207,10 @@ exports.AddToOrders = (req, res) => {
             res.redirect("/orders")
         })
         .catch(err => {
-            console.log(err)
-            res.redirect("/500")
-            const error = new Error(err)
+            const error = new Error(err.message)
             error.statusCode = 500
             return next(error)
         })
-
-
-
-    // req.user.addOrder()
-    // .then(result=>{
-    //     res.redirect("/orders")
-    // })
-    // .catch(err=> console.log(err))
-
-
-
-    // .getCart()
-    // .then(cart=>{
-    //     fetchCart = cart
-    //     return cart.getProducts()
-    // })
-    // .then(products=>{
-    //     return req.user.createOrder()
-    //     .then(order=>{
-    //         console.log(order)
-    //         return order.addProduct(products.map(product=>{
-    //             product.orderItem = {quantity: product.cartItem.quantity}
-    //             return product
-    //         }))
-    //     }).catch(err=> console.log(err))
-    // })
-    // .then(result=>{
-    //     return fetchCart.setProducts(null)
-    // })
-    // .then(result=>{
-    //   res.redirect("/orders")  
-    // })
-    // .catch(err=> console.log(err))
-
 }
 
 
@@ -349,14 +226,7 @@ exports.getOrderInvoice = (req, res, next) => {
             }
             const invoiceName = "invoice-" + orderId + ".pdf"
             const invoicePath = path.join("data", "invoices", invoiceName)
-            // fs.readFile(invoicePath, (err, invoice) => {
-            //     if (err) {
-            //         return next(err)
-            //     }
-            //     res.setHeader("Content-Type", "application/pdf")
-            //     res.setHeader("Content-Disposition", "inline;", "flename='", + invoiceName + "'")
-            //     res.send(invoice)
-            // })
+
             const pdfDoc = new PDFDocument()
             res.setHeader("Content-Type", "application/pdf")
             res.setHeader("Content-Disposition", "inline;", "filename='", + invoiceName + "'")
@@ -372,11 +242,9 @@ exports.getOrderInvoice = (req, res, next) => {
             })
             pdfDoc.fontSize(20).text("Total Price:" + totalPrice)
             pdfDoc.end()
-            // const file = fs.createReadStream(invoicePath)
 
-            // file.pipe(res)
         })
-        .catch(err => next(new Error(err))
+        .catch(err => next(new Error(err.message))
         )
 
 

@@ -24,9 +24,11 @@
                 <input type="tel" name="amount" id="amount" disabled value=<%= amount  %>>
             </div>
             <input type="hidden" value="<%= csrfToken %>" name="_csrf" />
-            <button disabled class="btn" onclick="pay(this)">Pay</button>
-            <form>
-                <button disabled class="btn">Verify</button>
+            <input type="hidden" value="<%= paystackPK %>" name="paystack-pk" />
+            <button class="btn" onclick="pay(this)">Pay</button>
+            <form id="verify-form" method="POST">
+                <input type="hidden" value="<%= csrfToken %>" name="_csrf"/>
+                <button disabled style="padding: 8px 6px; border: 1px solid #00695c; padding: 0.25rem 1rem; font: inherit; cursor: pointer;" id="verify-btn">Verify</button>
             </form>
         </div>
         <div style="margin-top: 30px;">

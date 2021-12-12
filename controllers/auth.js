@@ -11,7 +11,6 @@ const transporter = nodemailer.createTransport(sendgrid({
   }
 }))
 
-console.log(process.env.SENDGRID_API_KEY)
 exports.getLoginPage = (req, res, next) => {
   let message = req.flash("error")
   if (message.length > 0) {
@@ -82,15 +81,12 @@ exports.login = (req, res, next) => {
           req.session.isLoggedIn = true;
           req.session.user = user;
           req.session.save(err => {
-            console.log(err);
             res.redirect('/');
           });
         })
     })
     .catch(err => {
-      console.log(err)
-      res.redirect("/500")
-      const error = new Error(err)
+      const error = new Error(err.message)
       error.statusCode = 500
       return next(error)
   });
@@ -127,9 +123,7 @@ exports.signup = (req, res, next) => {
       })
     })
     .catch(err => {
-      console.log(err)
-      res.redirect("/500")
-      const error = new Error(err)
+      const error = new Error(err.message)
       error.statusCode = 500
       return next(error)
   })
@@ -137,7 +131,9 @@ exports.signup = (req, res, next) => {
 
 exports.logout = (req, res, next) => {
   req.session.destroy(err => {
-    console.log(err);
+    if(err){
+      return res.redirect('/500')
+    }
     res.redirect('/');
   });
 };
@@ -179,16 +175,18 @@ exports.resetPassword = (req, res) => {
               from: "stevepathagoras08@gmail.com",
               subject: "Reset Password",
               html: `<p>You Requested to reset your password</p>
-                 <P>Click this link <a href= "http://localhost:3000/reset-password/${token}">reset</a> your password
+                 <P>Click this link <a href= "${process.env.BASIC_URL}/reset-password/${token}">reset</a> your password
                 `
             })
           })
-          .catch(err=> console.log(err))
+          .catch(err=>  {
+            const error = new Error(err.message)
+            error.statusCode = 500
+            return next(error)
+          })
       })
       .catch(err => {
-        console.log(err)
-        res.redirect("/500")
-        const error = new Error(err)
+        const error = new Error(err.message)
         error.statusCode = 500
         return next(error)
     })
@@ -212,6 +210,11 @@ exports.getNewPasswordPage = (req, res) => {
         token: token
       });
     })
+    .catch(err => {
+      const error = new Error(err.message)
+      error.statusCode = 500
+      return next(error)
+  })
 
 }
 
@@ -235,9 +238,7 @@ exports.changePassword = (req, res) => {
       res.redirect("/login")
     })
     .catch(err => {
-      console.log(err)
-      res.redirect("/500")
-      const error = new Error(err)
+      const error = new Error(err.message)
       error.statusCode = 500
       return next(error)
   })
