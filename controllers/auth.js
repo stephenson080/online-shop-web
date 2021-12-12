@@ -7,9 +7,11 @@ const { validationResult } = require("express-validator/check")
 
 const transporter = nodemailer.createTransport(sendgrid({
   auth: {
-    api_key: "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"
+    api_key: process.env.SENDGRID_API_KEY
   }
 }))
+
+console.log(process.env.SENDGRID_API_KEY)
 exports.getLoginPage = (req, res, next) => {
   let message = req.flash("error")
   if (message.length > 0) {
