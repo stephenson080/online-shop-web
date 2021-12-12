@@ -7,7 +7,10 @@ const bodyParser = require("body-parser")
 const csrf = require("csurf")
 const flash = require("connect-flash")
 const multer = require("multer")
-require('dotenv').config()
+
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config()
+}
 // const {mongoConnection} = require("./util/database")
 
 const shopRoutes = require("./routes/shop")
@@ -100,10 +103,11 @@ app.use((err,req,res,next)=>{
     res.redirect("/500")
 })
 
+const PORT = process.env.PORT || 3000
 
 moongoose.connect("mongodb+srv://stephen:pathagoras1555@cluster0.xrlnc.mongodb.net/online-shop?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true})
 .then(result=>{
-    app.listen(3000,()=>{
+    app.listen(PORT,()=>{
         console.log("app is running")
     })
 })
