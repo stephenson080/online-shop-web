@@ -172,7 +172,6 @@ exports.verifyPayment = async (req, res, next) => {
                 'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`
             }
         })
-        req.user.clearCart()
         res.render('shop/success', {
             docTitle: 'Payment Status',
             path: '/status',
