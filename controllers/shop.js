@@ -1,9 +1,8 @@
 const path = require("path")
 const fs = require("fs")
 const PDFDocument = require("pdfkit")
-const Stripe = require('stripe')
-const stripe = Stripe('sk_test_51Haoy5FNxcMqZrciRbzBdQgMXWG7x0mYTCzT5dveAveDrjTzXyrecwl6IT9nDeKDDlFPThiW1gm63W21QQObgpZR00Wem4GciG')
 const { verifyPayment } = require('../util/paystack/verifyPayment')
+const axios = require('axios')
 
 const Product = require("../models/product")
 const Order = require("../models/order")
@@ -237,13 +236,18 @@ exports.checkout = async (req, res, next) => {
         products.forEach(prod => {
             amount += prod.quantity * prod.productId.price
         })
-        return res.render("shop/checkout", {
-            path: '/checkout',
-            docTitle: 'checkout',
-            amount: amount / 100,
-            email: user.email,
-            cartProducts: products
+
+        axios.default.post('http://localhost:3000/', {amount: amount}).then(res => {
+            console.log(res.data)
+            return res.render("shop/checkout", {
+                path: '/checkout',
+                docTitle: 'checkout',
+                amount: amount / 100,
+                email: user.email,
+                cartProducts: products
+            })
         })
+       
     } catch (err) {
         res.redirect("/500")
         const error = new Error(err)
