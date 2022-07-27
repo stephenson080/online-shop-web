@@ -150,7 +150,7 @@ exports.checkout = async (req, res, next) => {
         return res.render("shop/checkout", {
             path: '/checkout',
             docTitle: 'Checkout',
-            amount: amount / 100,
+            amount: Math.ceil(amount / 100),
             email: user.email,
             paystackPK: process.env.PAYSTACK_PUBLIC_KEY,
             cartProducts: products
